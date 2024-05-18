@@ -105,7 +105,7 @@
   <body>
     <main>
       <h1>WHICH POKEMON IS THE BEST?</h1>
-      <form action="success.html">
+      <form >
         <div class="select-menu">
           <input type="text" name="pokemon" autocomplete="off">
           <div class="select-menu__suggestions">
@@ -128,105 +128,6 @@
         'Mewtwo',
         'Mew'
       ];
-
-      const menu = document.querySelector('.select-menu');
-      const input = document.querySelector('input');
-      const suggestions = document.querySelector('.select-menu__suggestions');
-      const form = document.querySelector('form');
-      const error = document.querySelector('.error');
-      let currentElement = null;
-
-      function showError() {
-        error.style.display = 'block';
-      }
-
-      function hideError() {
-        error.style.display = 'none';
-      }
-
-      function showSuggestions(filter) {
-        suggestions.replaceChildren(...pokemons
-          .filter((pokemon) => pokemon.toLowerCase().startsWith(filter.toLowerCase()))
-          .slice(0, 5)
-          .map((pokemon) => {
-            const button = document.createElement('button');
-            button.textContent = pokemon;
-            button.tabIndex = -1;
-            return button;
-          })
-        );
-      }
-
-      input.addEventListener('focus', ({ target }) => {
-        showSuggestions(target.value);
-      });
-
-      input.addEventListener('input', ({ target }) => {
-        showSuggestions(target.value);
-        hideError();
-      });
-
-      menu.addEventListener('click', (e) => {
-        if (e.target.tagName === 'BUTTON') {
-          input.value = e.target.textContent;
-          showSuggestions(input.value);
-        }
-      });
-
-      function moveToNextElement() {
-        const pokemonList = Array.from(document.querySelectorAll('.select-menu__suggestions button'));
-        if (!pokemonList.length) {
-          return;
-        }
-        const currentElementIndex = pokemonList.indexOf(currentElement);
-
-        if (currentElementIndex < pokemonList.length - 1) {
-          currentElement = pokemonList[currentElementIndex + 1];
-          currentElement.focus();
-        } else {
-          currentElement = pokemonList[0];
-          currentElement.focus();
-        }
-      }
-
-      function moveToPreviousElement() {
-        const pokemonList = Array.from(document.querySelectorAll('.select-menu__suggestions button'));
-        if (!pokemonList.length) {
-          return;
-        }
-        const currentElementIndex = pokemonList.indexOf(currentElement);
-
-        if (currentElementIndex > 0) {
-          currentElement = pokemonList[currentElementIndex - 1];
-          currentElement.focus();
-        } else {
-          currentElement = pokemonList[pokemonList.length - 1];
-          currentElement.focus();
-        }
-      }
-
-      menu.addEventListener('keydown', (e) => {
-        if (e.key === 'ArrowDown') {
-          moveToNextElement();
-        } else if (e.key === 'ArrowUp') {
-          moveToPreviousElement();
-        }
-      });
-
-      form.addEventListener('submit', (e) => {
-        const data = new FormData(e.target);
-        const selectedPokemon = data.get('pokemon');
-
-        if (!selectedPokemon) {
-          e.preventDefault();
-          return;
-        }
-
-        if (selectedPokemon !== 'Pikachu') {
-          showError();
-          e.preventDefault();
-        }
-      });
     </script>
   </body>
 </html>
