@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Which Pokemon is the best?</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;900&display=swap" rel="stylesheet">
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: 'Roboto', sans-serif;
+        font-weight: 400;
+        background-color: dodgerblue;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+      }
+
+      h1 {
+        font-weight: 900;
+        color: gold;
+        font-size: 3rem;
+      }
+
+      input {
+        width: 100%;
+        font-size: 2rem;
+        background-color: whitesmoke;
+        border-radius: 0.5em;
+        padding: 0.5em;
+        border: 5px solid black;
+        outline: none;
+      }
+
+      .select-menu {
+        position: relative;
+        font-size: 2rem;
+        border-radius: 0.5em;
+
+        &:focus-within {
+          input {
+            border-bottom: transparent;
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 0;
+            border-bottom: 0;
+          }
+
+          .select-menu__suggestions {
+            display: block;
+          }
+        }
+
+        .select-menu__suggestions {
+          display: none;
+          position: absolute;
+          background-color: whitesmoke;
+          border-bottom-left-radius: 0.5em;
+          border-bottom-right-radius: 0.5em;
+          border: 5px solid black;
+          border-top: transparent;
+          width: 100%;
+        }
+
+        button {
+          width: 100%;
+          font-size: 2rem;
+          background-color: transparent;
+          border: none;
+          padding: 0.5em;
+          cursor: pointer;
+        }
+      }
+
+      form {
+        button[type="submit"] {
+          background-color: gold;
+          border: 5px solid black;
+          border-radius: 0.5em;
+          width: 100%;
+          font-size: 2rem;
+          padding: 0.5em;
+          margin-top: 1em;
+          cursor: pointer;
+        }
+      }
+
+      .error {
+        display: none;
+        background: orangered;
+        font-size: 3rem;
+        padding: 0.5em;
+        color: whitesmoke;
+        border-radius: 0.5em;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>WHICH POKEMON IS THE BEST?</h1>
+      <form action="success.html">
+        <div class="select-menu">
+          <input type="text" name="pokemon" autocomplete="off">
+          <div class="select-menu__suggestions">
+          </div>
+        </div>
+        <button type="submit">Submit</button>
+        <p class="error">
+          You are wrong!
+        </p>
+      </form>
+    </main>
+    <script>
+      const pokemons = [
+        'Pikachu',
+        'Charizard',
+        'Squirtle',
+        'Bulbasaur',
+        'Pidgey',
+        'Snorlax',
+        'Mewtwo',
+        'Mew'
+      ];
+
+      const menu = document.querySelector('.select-menu');
+      const input = document.querySelector('input');
+      const suggestions = document.querySelector('.select-menu__suggestions');
+      const form = document.querySelector('form');
+      const error = document.querySelector('.error');
+      let currentElement = null;
+
+      function showError() {
+        error.style.display = 'block';
+      }
+
+      function hideError() {
+        error.style.display = 'none';
+      }
+
+      function showSuggestions(filter) {
+        suggestions.replaceChildren(...pokemons
+          .filter((pokemon) => pokemon.toLowerCase().startsWith(filter.toLowerCase()))
+          .slice(0, 5)
+          .map((pokemon) => {
+            const button = document.createElement('button');
+            button.textContent = pokemon;
+            button.tabIndex = -1;
+            return button;
+          })
+        );
+      }
+
+      input.addEventListener('focus', ({ target }) => {
+        showSuggestions(target.value);
+      });
+
+      input.addEventListener('input', ({ target }) => {
+        showSuggestions(target.value);
+        hideError();
+      });
+
+      menu.addEventListener('click', (e) => {
+        if (e.target.tagName === 'BUTTON') {
+          input.value = e.target.textContent;
+          showSuggestions(input.value);
+        }
+      });
+
+      function moveToNextElement() {
+        const pokemonList = Array.from(document.querySelectorAll('.select-menu__suggestions button'));
+        if (!pokemonList.length) {
+          return;
+        }
+        const currentElementIndex = pokemonList.indexOf(currentElement);
+
+        if (currentElementIndex < pokemonList.length - 1) {
+          currentElement = pokemonList[currentElementIndex + 1];
+          currentElement.focus();
+        } else {
+          currentElement = pokemonList[0];
+          currentElement.focus();
+        }
+      }
+
+      function moveToPreviousElement() {
+        const pokemonList = Array.from(document.querySelectorAll('.select-menu__suggestions button'));
+        if (!pokemonList.length) {
+          return;
+        }
+        const currentElementIndex = pokemonList.indexOf(currentElement);
+
+        if (currentElementIndex > 0) {
+          currentElement = pokemonList[currentElementIndex - 1];
+          currentElement.focus();
+        } else {
+          currentElement = pokemonList[pokemonList.length - 1];
+          currentElement.focus();
+        }
+      }
+
+      menu.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowDown') {
+          moveToNextElement();
+        } else if (e.key === 'ArrowUp') {
+          moveToPreviousElement();
+        }
+      });
+
+      form.addEventListener('submit', (e) => {
+        const data = new FormData(e.target);
+        const selectedPokemon = data.get('pokemon');
+
+        if (!selectedPokemon) {
+          e.preventDefault();
+          return;
+        }
+
+        if (selectedPokemon !== 'Pikachu') {
+          showError();
+          e.preventDefault();
+        }
+      });
+    </script>
+  </body>
+</html>
